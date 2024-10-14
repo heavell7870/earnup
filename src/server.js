@@ -17,7 +17,8 @@ const createExpressApp = () => {
     expressApp.use(
         cors({
             methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
-            origin: ['https://client.com'],
+            // origin: [config.FRONTEND_URL],
+            origin:"*",
             credentials: true
         })
     )

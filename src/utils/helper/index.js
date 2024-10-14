@@ -99,16 +99,22 @@ export class Helper {
         }
     }
 
-    static getDeliveryCharges(distance) {
-        if (distance < 5) {
-            return 50; // Delivery charge for less than 5 km
-        } else if (distance < 10) {
-            return 100; // Delivery charge for 5-10 km
+    static calculateDeliveryCharges(km) {
+        let deliveryCharge = 0;
+        if (km <= 5) {
+            deliveryCharge = km * 10; // 10 rupees per km for up to 5 km
+        } else if (km > 5 && km <= 7) {
+            deliveryCharge = (5 * 10) + ((km - 5) * 20); // 10 rupees for first 5 km, 20 rupees for the next 2 km
+        } else if (km > 7 && km <= 8) {
+            deliveryCharge = (5 * 10) + (2 * 20) + ((km - 7) * 30); // 10 rupees for first 5 km, 20 rupees for next 2 km, 30 rupees for next 1 km
+        } else if (km > 8 && km <= 9.5) {
+            deliveryCharge = (5 * 10) + (2 * 20) + (1 * 30) + ((km - 8) * 40); // Additional charges for the distance above 8 km
         } else {
-            return 150; // Delivery charge for more than 10 km
+            deliveryCharge = (5 * 10) + (2 * 20) + (1 * 30) + (1.5 * 40) + ((km - 9.5) * 40); // 40 rupees per km for distances above 9.5 km
         }
+        return deliveryCharge;
     }
-
+    
     static applySurcharge(isRaining, isMidnight) {
         let surcharge = 0;
         if (isRaining) {

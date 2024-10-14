@@ -3,8 +3,10 @@ import { CartRepository } from "../repositories/cartReposiroty.js";
 import { UserRepository } from "../repositories/userReposiroty.js";
 import { ProductRepository } from "../repositories/productRepository.js";
 import { VarientRepository } from "../repositories/productRepository.js";
+import { StoreRepository } from "../repositories/productRepository.js";
 import { AppError } from "../utils/hanlders/appError.js";
 import mongoose from "mongoose";
+import { Helper } from "../utils/helper/index.js";
 
 export class CartService {
     constructor() {
@@ -12,6 +14,7 @@ export class CartService {
         this.userRepository = new UserRepository();
         this.productRepository = new ProductRepository();
         this.variantRepository = new VarientRepository();
+        this.storeRepository = new StoreRepository();
     }
     async addProductInToCart(data) {
         try {
@@ -85,14 +88,17 @@ export class CartService {
             throw new AppError(error.statusCode, error.message, error);
         }
     }
-    async getCartOfAUser(userId) {
+    async getCartOfAUser(userId, storeId = "670d41833443742d399ce8f6") {
         try {
             // Check if the user exists
-            const userExist = await this.userRepository.getById(userId);
+            const [userExist, storeExist] = await Promise.all([
+                this.userRepository.getById(userId),
+                this.storeRepository.getById(storeId)
+            ])
             if (!userExist) throw new AppError(StatusCodes.NOT_FOUND, 'User Not Found');
-    
+            if (!storeExist) throw new AppError(StatusCodes.NOT_FOUND, 'User Not Found');
             let cartDetails = await this.repository.getcartAggregation([
-                { 
+                {
                     $match: { userId: new mongoose.Types.ObjectId(userId) } // Match userId 
                 },
                 {
@@ -176,7 +182,7 @@ export class CartService {
                 {
                     $group: {
                         _id: "$userId", // Group by userId
-                        fetchProducts: { 
+                        fetchProducts: {
                             $push: {
                                 _id: "$_id",
                                 quantity: "$quantity",
@@ -192,13 +198,30 @@ export class CartService {
                     }
                 }
             ]);
-    
+
             if (!cartDetails || cartDetails.length === 0) {
                 return cartDetails
             }
-            return cartDetails[0]; // Return the first (and only) document in the result
+            // return cartDetails[0]; // Return the first (and only) document in the result
+            const cart = cartDetails[0];
+            // Return all necessary details
+            let responseObj = {
+                userId: userId,
+                products: cart.fetchProducts,
+                address: cart.userAddressDetails
+            }
+            if (!storeExist?.online || !storeExist?.open) responseObj.isServicable = false
+            responseObj.priceDetails = {
+                totalSellingPrice: cart.totalSellingPrice,
+                totalMaximumPrice: cart.totalMaximumPrice,
+                couponDiscount: 20,
+                deliveryCharges: 35
+            }
+            if (storeExist.isRaining || storeExist.isMidnight) responseObj.priceDetails.surcharges = Helper.applySurcharge(storeExist.isRaining, storeExist.isMidnight)
+            responseObj.priceDetails.amountToPay= (responseObj.priceDetails.totalSellingPrice-(responseObj.priceDetails.couponDiscount||0))+responseObj.priceDetails.deliveryCharges+(responseObj.priceDetails.surcharges||0)
+            return responseObj
         } catch (error) {
             throw new AppError(error.statusCode, error.message, error);
         }
-    }     
+    }
 }
