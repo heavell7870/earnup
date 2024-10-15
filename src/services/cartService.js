@@ -208,7 +208,7 @@ export class CartService {
             let responseObj = {
                 userId: userId,
                 products: cart.fetchProducts,
-                address: cart.userAddressDetails
+                address: cart.userAddressDetails??null
             }
             if (!storeExist?.online || !storeExist?.open) responseObj.isServicable = false
             responseObj.priceDetails = {
