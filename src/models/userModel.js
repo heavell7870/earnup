@@ -53,6 +53,9 @@ const schema = new mongoose.Schema({
     emailVerificationExpiry: {
         type: Date,
     },
+    lastLogin: {
+        type: Date,
+    },
     isActive:{
         type:Boolean,
         default:false

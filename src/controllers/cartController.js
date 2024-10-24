@@ -33,8 +33,9 @@ export class CartController {
         return res.status(StatusCodes.OK).send(new ApiResponse(StatusCodes.CREATED, cart, "Product Removed From Cart successfully"));
     })
     getCart = catchAsync(async (req, res) => {
+        const { storeId } = req.params
         if (!req?.user) throw new AppError(StatusCodes.UNAUTHORIZED, "Token Missing in Headers")
-        const cart = await this.service.getCartOfAUser(req.user);
+        const cart = await this.service.getCartOfAUser(req.user,storeId);
         return res.status(StatusCodes.OK).send(new ApiResponse(StatusCodes.CREATED, cart, "cart fetched To successfully"));
     })
 }

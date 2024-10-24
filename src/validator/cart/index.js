@@ -17,3 +17,10 @@ export const updateCartSchema = {
     })
 };
 
+export const getCartSchema = {
+    params: Joi.object().keys({
+        storeId: Joi.string().required().custom(objectId),
+        couponId: Joi.string().optional().custom(objectId),
+    })
+};
+

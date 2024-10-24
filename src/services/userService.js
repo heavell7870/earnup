@@ -63,6 +63,7 @@ export class UserService {
             user.isActive = true;
             user.verificationOTP = null; // Clear OTP after successful validation
             user.verificationOTPExpiry = null; // Clear expiry time
+            user.lastLogin=new Date()
             await user.save();
             let generateToken = await Helper.generateAccessAndRefreshTokens(user)
             return { ...generateToken, name: user.name, avtar: user?.avtar, phone: user.phone, user_id: user._id }

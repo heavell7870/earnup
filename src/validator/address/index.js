@@ -50,3 +50,10 @@ export const singleAddressSchema = {
         addressId: Joi.string().required().custom(objectId),
     })
 };
+
+export const nearByAddressSchema = {
+    query: Joi.object().keys({
+        lat: Joi.number().required(),
+        lon: Joi.number().required()
+    })
+};

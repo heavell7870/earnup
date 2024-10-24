@@ -88,7 +88,7 @@ export class CartService {
             throw new AppError(error.statusCode, error.message, error);
         }
     }
-    async getCartOfAUser(userId, storeId = "670d41833443742d399ce8f6") {
+    async getCartOfAUser(userId, storeId) {
         try {
             // Check if the user exists
             const [userExist, storeExist] = await Promise.all([
@@ -98,9 +98,7 @@ export class CartService {
             if (!userExist) throw new AppError(StatusCodes.NOT_FOUND, 'User Not Found');
             if (!storeExist) throw new AppError(StatusCodes.NOT_FOUND, 'User Not Found');
             let cartDetails = await this.repository.getcartAggregation([
-                {
-                    $match: { userId: new mongoose.Types.ObjectId(userId) } // Match userId 
-                },
+                { $match: { userId: new mongoose.Types.ObjectId(userId) } }, // Match userId in the cart collection
                 {
                     $lookup: {
                         from: 'userAddresses',
@@ -126,7 +124,9 @@ export class CartService {
                                     pincode: 1,
                                     country: 1,
                                     latitude: 1,
-                                    longitude: 1
+                                    longitude: 1,
+                                    deliveryDetails: 1,
+                                    nearestStore: 1
                                 }
                             }
                         ],
@@ -172,6 +172,7 @@ export class CartService {
                             unit: 1,
                             weight: 1,
                             mrp: 1,
+                            availableQuantity: 1,
                             sellingPrice: 1
                         },
                         totalMrp: { $multiply: ['$varientDetails.mrp', '$quantity'] }, // Calculate total MRP
@@ -198,27 +199,39 @@ export class CartService {
                     }
                 }
             ]);
-
-            if (!cartDetails || cartDetails.length === 0) {
-                return cartDetails
-            }
-            // return cartDetails[0]; // Return the first (and only) document in the result
+            if (!cartDetails || cartDetails.length === 0) return cartDetails
             const cart = cartDetails[0];
             // Return all necessary details
             let responseObj = {
                 userId: userId,
                 products: cart.fetchProducts,
-                address: cart.userAddressDetails??null
+                address: cart.userAddressDetails ?? null
             }
-            if (!storeExist?.online || !storeExist?.open) responseObj.isServicable = false
+            if (cart.userAddressDetails) {
+                let nearbyStores = await Helper.findStoresNearUser(Number(cart.userAddressDetails.latitude), Number(cart.userAddressDetails.longitude))
+                if (!nearbyStores.length) responseObj.isServicable = false
+            }
+            if (!storeExist?.toObject()?.online || !storeExist?.toObject()?.open) responseObj.isServicable = false
             responseObj.priceDetails = {
                 totalSellingPrice: cart.totalSellingPrice,
                 totalMaximumPrice: cart.totalMaximumPrice,
                 couponDiscount: 20,
                 deliveryCharges: 35
             }
+            if (!responseObj?.isServicable) {
+                if (cart.userAddressDetails.nearestStore.toString() != storeId) {
+                    let calculateDistance = await Helper.calculateDistance([storeExist?.toObject()?.coordinates.coordinates[1].toString() + "," + storeExist?.toObject()?.coordinates.coordinates[0].toString()], [cart.userAddressDetails?.latitude + "," + cart.userAddressDetails?.longitude])
+                    responseObj.DeliveryDetails = calculateDistance
+                    if (calculateDistance) responseObj.priceDetails.deliveryCharges = Helper.calculateDeliveryCharges(calculateDistance.distance.split(' ')[0])
+                    } else {
+                    responseObj.DeliveryDetails = cart.userAddressDetails.deliveryDetails
+                    responseObj.priceDetails.deliveryCharges = Helper.calculateDeliveryCharges(cart.userAddressDetails.deliveryDetails.distance.split(' ')[0])
+                }
+            }
             if (storeExist.isRaining || storeExist.isMidnight) responseObj.priceDetails.surcharges = Helper.applySurcharge(storeExist.isRaining, storeExist.isMidnight)
-            responseObj.priceDetails.amountToPay= (responseObj.priceDetails.totalSellingPrice-(responseObj.priceDetails.couponDiscount||0))+responseObj.priceDetails.deliveryCharges+(responseObj.priceDetails.surcharges||0)
+            responseObj.priceDetails.amountToPay = (responseObj.priceDetails.totalSellingPrice - (responseObj.priceDetails.couponDiscount || 0)) + responseObj.priceDetails.deliveryCharges + (responseObj.priceDetails.surcharges || 0)
+            let encodeObj=Helper.encodeData(responseObj)
+            responseObj.cart=encodeObj
             return responseObj
         } catch (error) {
             throw new AppError(error.statusCode, error.message, error);

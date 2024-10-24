@@ -58,6 +58,13 @@ const schema = new mongoose.Schema({
     instructions:{
         type: String
     },
+    nearestStore:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'stores',
+    },
+    deliveryDetails:{
+        type:Object
+    },
     isDefault: {
         type: Boolean,
         default: true

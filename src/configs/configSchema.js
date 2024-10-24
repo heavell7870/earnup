@@ -31,6 +31,7 @@ export const ValidConfigurationSchema = Joi.object().keys({
     "SMTP_USERNAME": Joi.string().required().description('smtp user name is missing in config file'),
     "SMTP_PASSWORD": Joi.string().required().description('smtp password is missing in config file'),
     "EMAIL_FROM": Joi.string().required().description('email is missing in config file'),
+    "GOGLE_DISTNACE_API_KEY": Joi.string().required().description('google distance api key is missing in config file'),
     "FRONTEND_URL" : Joi.string().required().description('frontend url missing in config file'),
     "BACKEND_URL" : Joi.string().required().description('backend url missing in config file'),
     "ADMIN_URL" : Joi.string().required().description('admin url missing in config file'),
