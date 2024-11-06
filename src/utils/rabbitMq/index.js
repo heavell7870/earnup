@@ -4,6 +4,7 @@ import cartModel from '../../models/cartModel.js';
 import { errorHandler } from '../hanlders/errorHandler.js';
 import logger from '../logger/index.js';
 import { Buffer } from 'buffer';
+
 let connection, channel;
 
 async function connectRabbitMQ() {
@@ -25,6 +26,7 @@ async function publishMessage(queueName, message, delay = 0) {
         const options = { persistent: true };
         if (delay > 0) options.headers = { 'x-delay': delay };
         channel.sendToQueue(queueName, Buffer.from(message), options);
+        logger.info(`Published message to ${queueName} with delay of ${delay}ms`);
     } catch (error) {
         logger.error(`Failed to publish message to ${queueName}:`, error);
     }
@@ -35,7 +37,7 @@ async function consumeMessage(queueName, onMessage) {
         await connectRabbitMQ();
         await channel.assertQueue(queueName, { durable: true });
         channel.consume(queueName, onMessage, { noAck: false });
-        logger.log(`Consuming messages from ${queueName}...`);
+        logger.info(`Consuming messages from ${queueName}...`);
     } catch (error) {
         logger.error(`Failed to consume messages from ${queueName}:`, error);
     }
@@ -44,7 +46,7 @@ async function consumeMessage(queueName, onMessage) {
 async function consumeOrderMessage() {
     await consumeMessage('orderProcessingQueue', async (msg) => {
         try {
-            const orderData = JSON.parse(Buffer.from(msg.content));
+            const orderData = JSON.parse(msg.content.toString());
             await Promise.all(orderData.products.map(async (product) => {
                 const order = await orderModel.create({
                     userId: orderData.userId,
@@ -56,10 +58,9 @@ async function consumeOrderMessage() {
                     isCod: orderData.paymentMode === 'cod',
                     orderProgressList: [{ status: 'Order Placed', time: new Date() }]
                 });
-                // await publishMessage('updateQuantityProductQueue', JSON.stringify(order[0]));
-                await publishMessage('orderApprovalQueue', Buffer.from(JSON.stringify(order), 60000)); // 1-minute delay
+                await publishMessage('orderApprovalQueue', JSON.stringify(order), 60000); // 1-minute delay
             }));
-            await cartModel.deleteMany({ userId: orderData.userId});
+            await cartModel.deleteMany({ userId: orderData.userId });
             channel.ack(msg);
         } catch (error) {
             logger.error('Order processing failed:', error);
@@ -68,34 +69,32 @@ async function consumeOrderMessage() {
     });
 }
 
-
 async function startApproveOrder() {
     await consumeMessage('orderApprovalQueue', async (msg) => {
-    try {
-        const approvalData = JSON.parse(Buffer.from(msg.content));
-        const order = await orderModel.findById(approvalData._id)
-        if (!order || order.isCancelled || order.isDelivered) {
-            logger.log(`Order ${approvalData.orderId} was cancelled or already delivered`);
+        try {
+            const approvalData = JSON.parse(msg.content.toString());
+            const order = await orderModel.findById(approvalData._id);
+            if (!order || order.isCancelled || order.isDelivered) {
+                logger.info(`Order ${approvalData._id} was cancelled or already delivered`);
+                channel.ack(msg);
+                return;
+            }
+            
+            order.isApproved = true;
+            order.orderProgressList.push({ status: 'Order Approved', time: new Date() });
+            await order.save();
+            logger.info(`Order ${approvalData._id} approved`);
             channel.ack(msg);
-            return;
+        } catch (error) {
+            logger.error('Order approval failed:', error);
+            channel.nack(msg, false, true); // Requeue the message
         }
-        
-        order.isApproved = true;
-        order.orderProgressList.push({ status: 'order approved', time: new Date() });
-        await order.save();
-        channel.ack(msg);
-    } catch (error) {
-        logger.error('Order approval failed:', error);
-        channel.nack(msg, false, true); // Requeue the message
-    }
-});
+    });
 }
-
 
 export {
     connectRabbitMQ,
     publishMessage,
     consumeOrderMessage,
-    // consumeUpdateQuantityMessage,
     startApproveOrder
 };

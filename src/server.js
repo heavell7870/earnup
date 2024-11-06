@@ -25,6 +25,16 @@ const createExpressApp = () => {
     expressApp.use(helmet())
     expressApp.use(express.json())
     expressApp.use(express.urlencoded({ extended: true }))
+    // Use this to integrate API Gateway
+    expressApp.use((req, res, next) => {
+        req.userId = req.headers["x-user-id"];
+        req.roleId = req.headers["x-role-id"];
+        req.storeId = req.headers["x-store-id"];
+        req.accessList = req.headers["x-access-list"]
+            ? JSON.parse(req.headers["x-access-list"])
+            : [];
+        next();
+    });
     // Apply compression middleware with custom configuration
     expressApp.use(
         compression({
@@ -66,9 +76,9 @@ async function startServer() {
 }
 /* Start RabbitMQ Consumers */
 async function startRabbitMQConsumers() {
-        await consumeOrderMessage();
-        await startApproveOrder();
-        logger.info('RabbitMQ consumers started successfully');
+    await consumeOrderMessage();
+    await startApproveOrder();
+    logger.info('RabbitMQ consumers started successfully');
 }
 
 /*listen the server*/
