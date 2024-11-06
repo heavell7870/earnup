@@ -85,7 +85,7 @@ export class CartService {
             // Check if the user exists
             const [userExist, storeExist] = await Promise.all([this.userRepository.getById(userId), this.storeRepository.getById(storeId)])
             if (!userExist) throw new AppError(StatusCodes.NOT_FOUND, 'User Not Found')
-            if (!storeExist) throw new AppError(StatusCodes.NOT_FOUND, 'User Not Found')
+            if (!storeExist) throw new AppError(StatusCodes.NOT_FOUND, 'Store Not Found')
             let cartDetails = await this.repository.getcartAggregation([
                 { $match: { userId: new mongoose.Types.ObjectId(userId) } }, // Match userId in the cart collection
                 {
@@ -162,11 +162,22 @@ export class CartService {
                             weight: 1,
                             mrp: 1,
                             availableQuantity: 1,
-                            sellingPrice: 1
+                            sellingPrice: 1,
+                            storeId: 1
                         },
                         totalMrp: { $multiply: ['$varientDetails.mrp', '$quantity'] }, // Calculate total MRP
                         totalSellingPrice: { $multiply: ['$varientDetails.sellingPrice', '$quantity'] }, // Calculate total Selling Price
                         userAddressDetails: 1 // Include address details in projection
+                    }
+                },
+                {
+                    $addFields: {
+                        notAvailable: {
+                            $or: [
+                                { $eq: ['$varientDetails.availableQuantity', 0] },
+                                { $ne: ['$varientDetails.storeId', new mongoose.Types.ObjectId(storeId)] }
+                            ]
+                        }
                     }
                 },
                 {
@@ -179,7 +190,8 @@ export class CartService {
                                 productDetails: '$productDetails',
                                 varientDetails: '$varientDetails',
                                 totalMrp: '$totalMrp',
-                                totalSellingPrice: '$totalSellingPrice'
+                                totalSellingPrice: '$totalSellingPrice',
+                                notAvailable: '$notAvailable'
                             }
                         }, // Push the products without address
                         totalMaximumPrice: { $sum: '$totalMrp' }, // Sum of total MRP for all products
@@ -202,6 +214,7 @@ export class CartService {
                     Number(cart.userAddressDetails.longitude)
                 )
                 if (!nearbyStores.length) responseObj.isServicable = false
+                // if(storeId.toString() !== nearbyStores[0]['_id'].toString()) responseObj.isDifferentStore = true
             }
             if (!storeExist?.toObject()?.online || !storeExist?.toObject()?.open) responseObj.isServicable = false
             responseObj.priceDetails = {
@@ -237,9 +250,16 @@ export class CartService {
                 (responseObj.priceDetails.couponDiscount || 0) +
                 responseObj.priceDetails.deliveryCharges +
                 (responseObj.priceDetails.surcharges || 0)
-            let encodeObj = Helper.encodeData(responseObj)
-            responseObj.cart = encodeObj
             return responseObj
+        } catch (error) {
+            throw new AppError(error.statusCode, error.message, error)
+        }
+    }
+
+    async emptyCart(userId) {
+        try {
+            let emptyCart = await this.repository.deleteMany({ userId: userId })
+            return emptyCart
         } catch (error) {
             throw new AppError(error.statusCode, error.message, error)
         }

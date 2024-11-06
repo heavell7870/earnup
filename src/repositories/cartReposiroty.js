@@ -1,5 +1,6 @@
 import { CrudRepository } from './index.js'
 import cartModel from '../models/cartModel.js'
+import { AppError } from '../utils/hanlders/appError.js'
 
 export class CartRepository extends CrudRepository {
     constructor() {

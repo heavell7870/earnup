@@ -7,6 +7,9 @@ export default [
     eslint.configs.recommended,
     eslintConfigPrettier,
     {
+        parserOptions: {
+            "ecmaVersion": 2020
+        },
         languageOptions: {
             ecmaVersion: 2021,
             sourceType: 'module',
@@ -18,5 +21,6 @@ export default [
             quotes: ['error', 'single', { allowTemplateLiterals: true }],
         },
         ignores: ['node_modules/**', 'dist/**'] // Replace ".eslintignore" with this property
-    }
+    },
+
 ];

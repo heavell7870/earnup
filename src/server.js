@@ -2,6 +2,7 @@ import express from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
 import compression from 'compression'
+import { consumeOrderMessage, startApproveOrder } from './utils/rabbitMq/index.js'
 import config from './configs/index.js'
 import logger from './utils/logger/index.js'
 import { defineRoutes } from './routes/index.js'
@@ -57,9 +58,17 @@ async function startServer() {
     //connect database
     let conf = await connect
     logger.info(`mongodb connected on port ${conf.connection.port}`)
+    // Start RabbitMQ consumers in parallel to the server
+    startRabbitMQConsumers();
     //listen the server
     const appAddress = await listenServer(httpServer)
     logger.info(`Server is running on ${appAddress.address}:${appAddress.port}`)
+}
+/* Start RabbitMQ Consumers */
+async function startRabbitMQConsumers() {
+        await consumeOrderMessage();
+        await startApproveOrder();
+        logger.info('RabbitMQ consumers started successfully');
 }
 
 /*listen the server*/
@@ -69,5 +78,4 @@ async function listenServer(expressApp) {
     errorHandler.listenToErrorEvents(connection)
     return connection.address()
 }
-
 export { startServer }

@@ -7,7 +7,8 @@ import moment from 'moment'
 import { storeModel } from '../../models/productModel.js'
 import distance from 'google-distance-matrix'
 import logger from '../logger/index.js';
-import { Buffer } from 'buffer'
+import { Buffer } from 'buffer';
+import crypto from 'crypto';
 
 export class Helper {
     /**
@@ -323,5 +324,20 @@ export class Helper {
     static decodeData(encodedData) {
         const decodedStr = Buffer.from(encodedData, 'base64').toString('utf-8') // Decode Base64 to JSON string
         return JSON.parse(decodedStr) // Parse the JSON string back into an object
+    }
+    static encrypt(text) {
+        const iv = crypto.randomBytes(16); // Generate a random initialization vector (IV)
+        const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(configs.ENCRYPTION_KEY, 'utf-8'), iv);
+        let encrypted = cipher.update(JSON.stringify(text), 'utf8', 'hex');
+        encrypted += cipher.final('hex');
+        return iv.toString('hex') + ':' + encrypted; // Combine IV with encrypted data
+    }
+    static decrypt(encryptedData) {
+            const [ivHex, encryptedText] = encryptedData.split(':');
+            const iv = Buffer.from(ivHex, 'hex');
+            const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(configs.ENCRYPTION_KEY, 'utf-8'), iv);
+            let decrypted = decipher.update(encryptedText, 'hex', 'utf-8');
+            decrypted += decipher.final('utf-8');
+            return JSON.parse(decrypted);
     }
 }

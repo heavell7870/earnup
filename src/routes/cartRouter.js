@@ -11,5 +11,6 @@ cartRouter.delete('/remove/:cartId', validate(updateCartSchema), verifyJWT, cart
 cartRouter.patch('/inc/:cartId', validate(updateCartSchema), verifyJWT, cartController.incrementProductCount)
 cartRouter.patch('/dec/:cartId', validate(updateCartSchema), verifyJWT, cartController.decrementProductCount)
 cartRouter.get('/fetch/:storeId', validate(getCartSchema), verifyJWT, cartController.getCart)
+cartRouter.get('/clear', verifyJWT, cartController.clearCart)
 
 export default cartRouter

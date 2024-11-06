@@ -6,7 +6,6 @@ import process from 'process';
 import logger from '../logger/index.js';
 
 let httpServerRef
-
 const errorHandler = {
     listenToErrorEvents: (httpServer) => {
         httpServerRef = httpServer
@@ -43,6 +42,12 @@ const errorHandler = {
             process.stdout.write(JSON.stringify(handlingError))
             process.stdout.write(JSON.stringify(errorToHandle))
         }
+    },
+    handleRabbitMqError: async (error) => {
+        if (error.code === 'ECONNREFUSED') {
+            logger.error('RabbitMQ connection refused, try to reconnect')
+            process.exit(1);
+        } 
     }
 }
 

@@ -7,6 +7,10 @@ const schema = new mongoose.Schema(
             ref: 'users',
             required: true
         },
+        storeId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'stores'
+        },
         productId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'products'

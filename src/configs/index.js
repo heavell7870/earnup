@@ -30,8 +30,6 @@ class Config {
         dotenv.config({ path: envPath })
 
         const sharedConfigFile = path.join(__dirname, `sharedConfig.json`)
-        if (fs.existsSync(sharedConfigFile)) {
-        }
         let config = JSON.parse(fs.readFileSync(sharedConfigFile))
 
         const finalConfig = {}

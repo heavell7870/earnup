@@ -93,130 +93,130 @@ export class UserService {
                         as: 'userAddresses'
                     }
                 },
-                {
-                    $lookup: {
-                        from: 'wishlists',
-                        let: {
-                            userId: '$_id'
-                        },
-                        pipeline: [
-                            {
-                                $match: { $expr: { $eq: ['$userId', '$$userId'] } }
-                            },
-                            {
-                                $lookup: {
-                                    from: 'products', // Name of the product collection
-                                    localField: 'productId',
-                                    foreignField: '_id',
-                                    as: 'productDetails'
-                                }
-                            },
-                            {
-                                $lookup: {
-                                    from: 'varients', // Name of the variant collection
-                                    localField: 'varientId',
-                                    foreignField: '_id',
-                                    as: 'varientDetails'
-                                }
-                            },
-                            {
-                                $unwind: '$productDetails' // Deconstruct product array
-                            },
-                            {
-                                $unwind: '$varientDetails' // Deconstruct variant array
-                            },
-                            {
-                                // Project only the necessary fields, and calculate totals based on quantity
-                                $project: {
-                                    _id: 1, // Cart ID
-                                    quantity: 1,
-                                    productDetails: {
-                                        _id: 1,
-                                        thumbnail: 1,
-                                        name: 1
-                                    },
-                                    varientDetails: {
-                                        unit: 1,
-                                        weight: 1,
-                                        mrp: 1,
-                                        sellingPrice: 1
-                                    }
-                                }
-                            }
-                        ],
-                        as: 'wishlists'
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'carts',
-                        let: {
-                            userId: '$_id'
-                        },
-                        pipeline: [
-                            {
-                                $match: { $expr: { $eq: ['$userId', '$$userId'] } }
-                            },
-                            {
-                                $lookup: {
-                                    from: 'products', // Name of the product collection
-                                    localField: 'productId',
-                                    foreignField: '_id',
-                                    as: 'productDetails'
-                                }
-                            },
-                            {
-                                $lookup: {
-                                    from: 'varients', // Name of the variant collection
-                                    localField: 'varientId',
-                                    foreignField: '_id',
-                                    as: 'varientDetails'
-                                }
-                            },
-                            {
-                                $unwind: '$productDetails' // Deconstruct product array
-                            },
-                            {
-                                $unwind: '$varientDetails' // Deconstruct variant array
-                            },
-                            {
-                                // Project only the necessary fields, and calculate totals based on quantity
-                                $project: {
-                                    _id: 1, // Cart ID
-                                    quantity: 1,
-                                    productDetails: {
-                                        _id: 1,
-                                        thumbnail: 1,
-                                        name: 1
-                                    },
-                                    varientDetails: {
-                                        unit: 1,
-                                        weight: 1,
-                                        mrp: 1,
-                                        sellingPrice: 1
-                                    }
-                                }
-                            }
-                        ],
-                        as: 'carts'
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'orders',
-                        localField: '_id',
-                        foreignField: 'userId',
-                        as: 'orders'
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'payments',
-                        localField: '_id',
-                        foreignField: 'userId',
-                        as: 'payments'
-                    }
-                }
+                // {
+                //     $lookup: {
+                //         from: 'wishlists',
+                //         let: {
+                //             userId: '$_id'
+                //         },
+                //         pipeline: [
+                //             {
+                //                 $match: { $expr: { $eq: ['$userId', '$$userId'] } }
+                //             },
+                //             {
+                //                 $lookup: {
+                //                     from: 'products', // Name of the product collection
+                //                     localField: 'productId',
+                //                     foreignField: '_id',
+                //                     as: 'productDetails'
+                //                 }
+                //             },
+                //             {
+                //                 $lookup: {
+                //                     from: 'varients', // Name of the variant collection
+                //                     localField: 'varientId',
+                //                     foreignField: '_id',
+                //                     as: 'varientDetails'
+                //                 }
+                //             },
+                //             {
+                //                 $unwind: '$productDetails' // Deconstruct product array
+                //             },
+                //             {
+                //                 $unwind: '$varientDetails' // Deconstruct variant array
+                //             },
+                //             {
+                //                 // Project only the necessary fields, and calculate totals based on quantity
+                //                 $project: {
+                //                     _id: 1, // Cart ID
+                //                     quantity: 1,
+                //                     productDetails: {
+                //                         _id: 1,
+                //                         thumbnail: 1,
+                //                         name: 1
+                //                     },
+                //                     varientDetails: {
+                //                         unit: 1,
+                //                         weight: 1,
+                //                         mrp: 1,
+                //                         sellingPrice: 1
+                //                     }
+                //                 }
+                //             }
+                //         ],
+                //         as: 'wishlists'
+                //     }
+                // },
+                // {
+                //     $lookup: {
+                //         from: 'carts',
+                //         let: {
+                //             userId: '$_id'
+                //         },
+                //         pipeline: [
+                //             {
+                //                 $match: { $expr: { $eq: ['$userId', '$$userId'] } }
+                //             },
+                //             {
+                //                 $lookup: {
+                //                     from: 'products', // Name of the product collection
+                //                     localField: 'productId',
+                //                     foreignField: '_id',
+                //                     as: 'productDetails'
+                //                 }
+                //             },
+                //             {
+                //                 $lookup: {
+                //                     from: 'varients', // Name of the variant collection
+                //                     localField: 'varientId',
+                //                     foreignField: '_id',
+                //                     as: 'varientDetails'
+                //                 }
+                //             },
+                //             {
+                //                 $unwind: '$productDetails' // Deconstruct product array
+                //             },
+                //             {
+                //                 $unwind: '$varientDetails' // Deconstruct variant array
+                //             },
+                //             {
+                //                 // Project only the necessary fields, and calculate totals based on quantity
+                //                 $project: {
+                //                     _id: 1, // Cart ID
+                //                     quantity: 1,
+                //                     productDetails: {
+                //                         _id: 1,
+                //                         thumbnail: 1,
+                //                         name: 1
+                //                     },
+                //                     varientDetails: {
+                //                         unit: 1,
+                //                         weight: 1,
+                //                         mrp: 1,
+                //                         sellingPrice: 1
+                //                     }
+                //                 }
+                //             }
+                //         ],
+                //         as: 'carts'
+                //     }
+                // },
+                // {
+                //     $lookup: {
+                //         from: 'orders',
+                //         localField: '_id',
+                //         foreignField: 'userId',
+                //         as: 'orders'
+                //     }
+                // },
+                // {
+                //     $lookup: {
+                //         from: 'payments',
+                //         localField: '_id',
+                //         foreignField: 'userId',
+                //         as: 'payments'
+                //     }
+                // }
             ])
             if (!user.length) throw new AppError(StatusCodes.NOT_FOUND, 'user not found')
             return user

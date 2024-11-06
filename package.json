@@ -16,14 +16,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/TheBhagwaan/user-service.git"
+        "url": "git+https://github.com/Farmershop01/Farmershop-Mobile-Backend-Portel.git"
     },
     "author": "Bhagaban Ghadai",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/TheBhagwaan/user-service/issues"
+        "url": "https://github.com/Farmershop01/Farmershop-Mobile-Backend-Portel/issues"
     },
-    "homepage": "https://github.com/TheBhagwaan/user-service#readme",
+    "homepage": "https://github.com/Farmershop01/Farmershop-Mobile-Backend-Portel#readme",
     "description": "",
     "lint-staged": {
         "*.js": [
@@ -32,6 +32,7 @@
         ]
     },
     "dependencies": {
+        "amqplib": "^0.10.4",
         "axios": "^1.7.7",
         "bcrypt": "^5.1.1",
         "compression": "^1.7.4",
