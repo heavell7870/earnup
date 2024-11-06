@@ -5,5 +5,5 @@ export const catchAsync = (requestHandler) => {
         } catch (error) {
             next(error)
         }
-    };
-};
+    }
+}

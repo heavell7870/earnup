@@ -1,26 +1,28 @@
-import { StatusCodes } from "http-status-codes";
-import { AddressRepository } from "../repositories/addressReposiroty.js";
-import { UserRepository } from "../repositories/userReposiroty.js";
-import { AppError } from "../utils/hanlders/appError.js";
-import { StoreRepository } from "../repositories/productRepository.js";
-import { Helper } from "../utils/helper/index.js";
+import { StatusCodes } from 'http-status-codes'
+import { AddressRepository } from '../repositories/addressReposiroty.js'
+import { UserRepository } from '../repositories/userReposiroty.js'
+import { AppError } from '../utils/hanlders/appError.js'
+import { Helper } from '../utils/helper/index.js'
 
 export class AddressService {
     constructor() {
-        this.repository = new AddressRepository();
-        this.userRepository = new UserRepository();
+        this.repository = new AddressRepository()
+        this.userRepository = new UserRepository()
     }
     async addAddress(data) {
         try {
             let userDetails = await this.userRepository.getById(data.userId)
             if (!userDetails) throw new AppError(StatusCodes.NOT_FOUND, 'user not found')
             let defalutAddressExist = await this.repository.getOne({ userId: userDetails._id, isDefault: true })
-            if(data.latitude&&data.longitude){
-                const nearestStore=await Helper.findStoresNearUser(Number(data.latitude), Number(data.longitude))
-                if(!nearestStore) throw new AppError(StatusCodes.NOT_FOUND, 'no store found near you')
-                let calculateDistance=await Helper.calculateDistance([nearestStore[0]?.coordinates.coordinates[1].toString()+","+nearestStore[0]?.coordinates.coordinates[0].toString()],[data?.latitude+","+data?.longitude])
-                data.nearestStore=nearestStore[0]["_id"]
-                data.deliveryDetails=calculateDistance
+            if (data.latitude && data.longitude) {
+                const nearestStore = await Helper.findStoresNearUser(Number(data.latitude), Number(data.longitude))
+                if (!nearestStore) throw new AppError(StatusCodes.NOT_FOUND, 'no store found near you')
+                let calculateDistance = await Helper.calculateDistance(
+                    [nearestStore[0]?.coordinates.coordinates[1].toString() + ',' + nearestStore[0]?.coordinates.coordinates[0].toString()],
+                    [data?.latitude + ',' + data?.longitude]
+                )
+                data.nearestStore = nearestStore[0]['_id']
+                data.deliveryDetails = calculateDistance
             }
             let address = await this.repository.create({ ...data, isDefault: true })
             if (defalutAddressExist && address) {
@@ -28,7 +30,7 @@ export class AddressService {
             }
             return address
         } catch (error) {
-            throw new AppError(error.statusCode, error.message, error);
+            throw new AppError(error.statusCode, error.message, error)
         }
     }
     async getAddress(addressId) {
@@ -37,7 +39,7 @@ export class AddressService {
             if (!addressDetails) throw new AppError(StatusCodes.NOT_FOUND, 'address not found')
             return addressDetails
         } catch (error) {
-            throw new AppError(error.statusCode, error.message, error);
+            throw new AppError(error.statusCode, error.message, error)
         }
     }
     async getDefaultAddressOfUser(userId) {
@@ -46,7 +48,7 @@ export class AddressService {
             if (!addressDetails) throw new AppError(StatusCodes.NOT_FOUND, 'no default addressfound')
             return addressDetails
         } catch (error) {
-            throw new AppError(error.statusCode, error.message, error);
+            throw new AppError(error.statusCode, error.message, error)
         }
     }
     async getAllAddressOfUser(userId) {
@@ -54,7 +56,7 @@ export class AddressService {
             let allAddress = await this.repository.getAll({ userId: userId })
             return allAddress
         } catch (error) {
-            throw new AppError(error.statusCode, error.message, error);
+            throw new AppError(error.statusCode, error.message, error)
         }
     }
     async updateAddress(addressId, userId, data) {
@@ -65,19 +67,21 @@ export class AddressService {
                 let defalutAddressExist = await this.repository.getOne({ userId: userId, isDefault: true })
                 if (defalutAddressExist) await this.repository.updateById(defalutAddressExist._id, { $set: { isDefault: false } })
             }
-        if(data.latitude&&data.longitude){
-            let nearestStore=await Helper.findStoresNearUser(Number(data.latitude), Number(data.longitude))
-            if(!nearestStore) throw new AppError(StatusCodes.NOT_FOUND, 'no store found near you')
-                let calculateDistance=await Helper.calculateDistance([nearestStore[0]?.coordinates.coordinates[1].toString()+","+nearestStore[0]?.coordinates.coordinates[0].toString()],[data?.latitude+","+data?.longitude])
-                data.nearestStore=nearestStore[0]["_id"]
-                data.deliveryDetails=calculateDistance
-            
-        }
+            if (data.latitude && data.longitude) {
+                let nearestStore = await Helper.findStoresNearUser(Number(data.latitude), Number(data.longitude))
+                if (!nearestStore) throw new AppError(StatusCodes.NOT_FOUND, 'no store found near you')
+                let calculateDistance = await Helper.calculateDistance(
+                    [nearestStore[0]?.coordinates.coordinates[1].toString() + ',' + nearestStore[0]?.coordinates.coordinates[0].toString()],
+                    [data?.latitude + ',' + data?.longitude]
+                )
+                data.nearestStore = nearestStore[0]['_id']
+                data.deliveryDetails = calculateDistance
+            }
             let updateAddressOfuser = await this.repository.updateById(addressDetails._id, data)
             if (!updateAddressOfuser) throw new AppError(StatusCodes.NOT_FOUND, 'error while update the address')
             return updateAddressOfuser
         } catch (error) {
-            throw new AppError(error.statusCode, error.message, error);
+            throw new AppError(error.statusCode, error.message, error)
         }
     }
     async deleteAddress(addressId) {
@@ -92,8 +96,7 @@ export class AddressService {
             if (!deleteAddressOfuser) throw new AppError(StatusCodes.NOT_FOUND, 'error while delete the address')
             return deleteAddressOfuser
         } catch (error) {
-            throw new AppError(error.statusCode, error.message, error);
+            throw new AppError(error.statusCode, error.message, error)
         }
     }
-
 }

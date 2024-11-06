@@ -1,5 +1,5 @@
-import nodemailer from "nodemailer";
-import configs from "../../configs/index.js";
+import nodemailer from 'nodemailer'
+import configs from '../../configs/index.js'
 
 export const sendEmail = async (to, subject, html) => {
     const msg = {
@@ -7,23 +7,23 @@ export const sendEmail = async (to, subject, html) => {
         to,
         subject,
         html // Now using the 'html' field for HTML content
-    };
+    }
     const transport = nodemailer.createTransport({
         host: configs.SMTP_HOST,
         port: configs.SMTP_PORT,
         secure: true, // Use SSL
         auth: {
             user: configs.SMTP_USERNAME,
-            pass: configs.SMTP_PASSWORD,
+            pass: configs.SMTP_PASSWORD
         }
-    });
-    await transport.sendMail(msg);
-};
+    })
+    await transport.sendMail(msg)
+}
 
 export const sendEmailVerificationLink = async (to, token) => {
-    const subject = 'Email Verification Link';
+    const subject = 'Email Verification Link'
     // replace this url with the link to the verify email page of your front-end app
-    const verifyEmailUrl = `${configs.FRONTEND_URL}/verify-email?token=${token}`;
+    const verifyEmailUrl = `${configs.FRONTEND_URL}/verify-email?token=${token}`
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -101,7 +101,7 @@ export const sendEmailVerificationLink = async (to, token) => {
         </div>
     </div>
 </body>
-</html>`;
+</html>`
 
-    await sendEmail(to, subject, html);
-};
+    await sendEmail(to, subject, html)
+}

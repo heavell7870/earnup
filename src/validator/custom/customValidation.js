@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
 export const objectId = (value, helpers) => {
     if (!mongoose.isValidObjectId(value)) {
-        return helpers.message({ custom: '"{{#label}}" must be a valid mongo id' });
+        return helpers.message({ custom: '"{{#label}}" must be a valid mongo id' })
     }
-    return value;
-};
+    return value
+}
