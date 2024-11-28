@@ -4,7 +4,7 @@ import { AppError } from '../utils/hanlders/appError'
 import * as admin from 'firebase-admin'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import fetch from 'node-fetch'
+import axios from 'axios'
 
 const FIREBASE_AUTH_URL = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCYmAlIqVcRp--ssi5ZIIGId7-jdm_4lHY'
 const FIREBASE_SIGNUP_URL = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCYmAlIqVcRp--ssi5ZIIGId7-jdm_4lHY'
@@ -40,19 +40,21 @@ export class UserService {
         if (!user) {
             throw new AppError(StatusCodes.NOT_FOUND, 'User does not exist')
         }
-        const response = await fetch(FIREBASE_AUTH_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
+        const response = await axios.post(
+            FIREBASE_AUTH_URL,
+            {
                 email,
                 password,
                 returnSecureToken: true // Request both idToken and refreshToken
-            })
-        })
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        )
 
-        const data: any = await response.json()
+        const data = response.data
 
         // Check if there was an error in the response from Firebase
         if (data.error) {
@@ -75,19 +77,21 @@ export class UserService {
         if (user) {
             throw new AppError(StatusCodes.BAD_REQUEST, 'User already exists')
         }
-        const response = await fetch(FIREBASE_SIGNUP_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
+        const response = await axios.post(
+            FIREBASE_SIGNUP_URL,
+            {
                 email,
                 password,
                 returnSecureToken: true // Request both idToken and refreshToken
-            })
-        })
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        )
 
-        const data: any = await response.json()
+        const data = response.data
 
         // Check if there was an error in the response from Firebase
         if (data.error) {
