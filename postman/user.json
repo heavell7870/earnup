@@ -1,0 +1,108 @@
+{
+    "info": {
+        "name": "User API",
+        "description": "Postman collection for User-related endpoints",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Login with Facebook",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"token\": \"<facebook_token>\"}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/login/facebook",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["login", "facebook"]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Login with Google",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"token\": \"<google_token>\"}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/login/google",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["login", "google"]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Login with Email and Password",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"email\": \"<email>\", \"password\": \"<password>\"}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/login/email-password",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["login", "email-password"]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Logout",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/logout",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["logout"]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Refresh Token",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"refreshToken\": \"<refresh_token>\"}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/refresh-token",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["refresh-token"]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Change Password",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"userId\": \"<user_id>\", \"newPassword\": \"<new_password>\"}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/change-password",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["change-password"]
+                }
+            },
+            "response": []
+        }
+    ]
+}
+
