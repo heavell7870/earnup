@@ -11,7 +11,8 @@
         "lint": "eslint . --ext .js",
         "lint:fix": "eslint . --fix",
         "format:check": "prettier . --check",
-        "format:fix": "prettier . --write"
+        "format:fix": "prettier . --write",
+        "build": "tsc"
     },
     "repository": {
         "type": "git",
