@@ -1,0 +1,112 @@
+{
+    "info": {
+        "_postman_id": "unique-id",
+        "name": "Referral API",
+        "description": "Collection for Referral related endpoints",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Create Referral",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"refereeId\": \"referee123\",\n    \"status\": \"PENDING\",\n    \"rewardStatus\": \"PENDING\",\n    \"rewardAmount\": 1000\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/referral",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["referral"]
+                },
+                "description": "Create a new referral"
+            }
+        },
+        {
+            "name": "Get Referral By Code",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{baseUrl}}/referral/code/:code",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["referral", "code", ":code"],
+                    "variable": [
+                        {
+                            "key": "code",
+                            "value": "REF123"
+                        }
+                    ]
+                },
+                "description": "Get referral details by referral code"
+            }
+        },
+        {
+            "name": "Get Referrals By Referrer ID",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{baseUrl}}/referral/referrer/:referrerId",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["referral", "referrer", ":referrerId"],
+                    "variable": [
+                        {
+                            "key": "referrerId",
+                            "value": "referrer123"
+                        }
+                    ]
+                },
+                "description": "Get all referrals for a specific referrer"
+            }
+        },
+        {
+            "name": "Get Referrals By Referee ID",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{baseUrl}}/referral/referee/:refereeId",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["referral", "referee", ":refereeId"],
+                    "variable": [
+                        {
+                            "key": "refereeId",
+                            "value": "referee123"
+                        }
+                    ]
+                },
+                "description": "Get all referrals for a specific referee"
+            }
+        },
+        {
+            "name": "Get Referral By ID",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{baseUrl}}/referral/:id",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["referral", ":id"],
+                    "variable": [
+                        {
+                            "key": "id",
+                            "value": "referral123"
+                        }
+                    ]
+                },
+                "description": "Get referral by ID"
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:9889",
+            "type": "string"
+        }
+    ]
+}
+

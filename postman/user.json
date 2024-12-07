@@ -1,107 +1,121 @@
 {
     "info": {
+        "_postman_id": "unique-id",
         "name": "User API",
-        "description": "Postman collection for User-related endpoints",
+        "description": "Collection for User related endpoints",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "item": [
         {
-            "name": "Login with Facebook",
+            "name": "Create User Profile",
             "request": {
                 "method": "POST",
-                "header": [],
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\"token\": \"<facebook_token>\"}"
+                    "raw": "{\n    \"avatar\": \"https://example.com/avatar.jpg\",\n    \"profileType\": \"PUBLIC\",\n    \"fullName\": \"John Doe\",\n    \"phone\": \"+1234567890\",\n    \"userName\": \"johndoe\",\n    \"email\": \"john@example.com\",\n    \"role\": \"USER\",\n    \"firebaseId\": \"firebase123\"\n}"
                 },
                 "url": {
-                    "raw": "{{baseUrl}}/login/facebook",
+                    "raw": "{{baseUrl}}/user/profile",
                     "host": ["{{baseUrl}}"],
-                    "path": ["login", "facebook"]
-                }
-            },
-            "response": []
+                    "path": ["user", "profile"]
+                },
+                "description": "Create a new user profile"
+            }
         },
         {
-            "name": "Login with Google",
+            "name": "Update User Profile",
             "request": {
-                "method": "POST",
-                "header": [],
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\"token\": \"<google_token>\"}"
+                    "raw": "{\n    \"avatar\": \"https://example.com/new-avatar.jpg\",\n    \"profileType\": \"PRIVATE\",\n    \"fullName\": \"John Smith\",\n    \"phone\": \"+1987654321\",\n    \"userName\": \"johnsmith\",\n    \"email\": \"john.smith@example.com\",\n    \"role\": \"USER\"\n}"
                 },
                 "url": {
-                    "raw": "{{baseUrl}}/login/google",
+                    "raw": "{{baseUrl}}/user/profile/:firebaseId",
                     "host": ["{{baseUrl}}"],
-                    "path": ["login", "google"]
-                }
-            },
-            "response": []
-        },
-        {
-            "name": "Login with Email and Password",
-            "request": {
-                "method": "POST",
-                "header": [],
-                "body": {
-                    "mode": "raw",
-                    "raw": "{\"email\": \"<email>\", \"password\": \"<password>\"}"
+                    "path": ["user", "profile", ":firebaseId"],
+                    "variable": [
+                        {
+                            "key": "firebaseId",
+                            "value": "firebase123"
+                        }
+                    ]
                 },
-                "url": {
-                    "raw": "{{baseUrl}}/login/email-password",
-                    "host": ["{{baseUrl}}"],
-                    "path": ["login", "email-password"]
-                }
-            },
-            "response": []
+                "description": "Update an existing user profile"
+            }
         },
         {
-            "name": "Logout",
+            "name": "Get User By Firebase ID",
             "request": {
-                "method": "POST",
-                "header": [],
+                "method": "GET",
                 "url": {
-                    "raw": "{{baseUrl}}/logout",
+                    "raw": "{{baseUrl}}/user/profile/:firebaseId",
                     "host": ["{{baseUrl}}"],
-                    "path": ["logout"]
-                }
-            },
-            "response": []
-        },
-        {
-            "name": "Refresh Token",
-            "request": {
-                "method": "POST",
-                "header": [],
-                "body": {
-                    "mode": "raw",
-                    "raw": "{\"refreshToken\": \"<refresh_token>\"}"
+                    "path": ["user", "profile", ":firebaseId"],
+                    "variable": [
+                        {
+                            "key": "firebaseId",
+                            "value": "firebase123"
+                        }
+                    ]
                 },
-                "url": {
-                    "raw": "{{baseUrl}}/refresh-token",
-                    "host": ["{{baseUrl}}"],
-                    "path": ["refresh-token"]
-                }
-            },
-            "response": []
+                "description": "Get user profile by Firebase ID"
+            }
         },
         {
-            "name": "Change Password",
+            "name": "Check Username Exists",
             "request": {
-                "method": "POST",
-                "header": [],
-                "body": {
-                    "mode": "raw",
-                    "raw": "{\"userId\": \"<user_id>\", \"newPassword\": \"<new_password>\"}"
-                },
+                "method": "GET",
                 "url": {
-                    "raw": "{{baseUrl}}/change-password",
+                    "raw": "{{baseUrl}}/user/check-username/:userName",
                     "host": ["{{baseUrl}}"],
-                    "path": ["change-password"]
-                }
-            },
-            "response": []
+                    "path": ["user", "check-username", ":userName"],
+                    "variable": [
+                        {
+                            "key": "userName",
+                            "value": "johndoe"
+                        }
+                    ]
+                },
+                "description": "Check if username already exists"
+            }
+        },
+        {
+            "name": "Get User By ID",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{baseUrl}}/user/:id",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["user", ":id"],
+                    "variable": [
+                        {
+                            "key": "id",
+                            "value": "user123"
+                        }
+                    ]
+                },
+                "description": "Get user by ID"
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:9889",
+            "type": "string"
         }
     ]
 }

@@ -3,7 +3,7 @@ interface Model<T> {
     findByIdAndDelete(id: string): Promise<T>
     deleteMany(obj: any): Promise<T>
     findById(id: string): Promise<T>
-    find(filter: any): Promise<T>
+    find(filter: any): Promise<T[]>
     findOne(obj: any): Promise<T>
     findOneAndUpdate(query: any, updatedData: Partial<T>, options: any): Promise<T>
     aggregate(pipeline: any[]): Promise<any[]>
@@ -36,7 +36,7 @@ export class CrudRepository<T> {
         return response
     }
 
-    async getAll(filter: any): Promise<T> {
+    async getAll(filter: any): Promise<T[]> {
         const response = await this.model.find(filter)
         return response
     }
@@ -46,7 +46,7 @@ export class CrudRepository<T> {
         return response
     }
 
-    async updateById(id: string, updatedData: Partial<T>): Promise<T> {
+    async updateById(id: string, updatedData: any): Promise<T> {
         const response = await this.model.findOneAndUpdate({ _id: id }, updatedData, { new: true })
         return response
     }

@@ -2,24 +2,22 @@ import express, { Router } from 'express'
 import { UserController } from '../controllers/userController'
 import { validate } from '../validator'
 import {
-    validateLoginWithFacebook,
-    validateLoginWithGoogle,
-    validateLoginWithEmailPassword,
-    validateRefreshToken,
-    validateChangePassword,
-    validateSignUpWithEmailPassword
-} from '../validator/user'
+    validateCreateUserProfile,
+    validateUpdateUserProfile,
+    validateGetUserByFirebaseId,
+    validateCheckUserNameExists,
+    validateGetUserById
+} from '../validator/userValidation'
+import { verifyAuthToken } from '../middlewares/auth'
 
 const userRouter: Router = express.Router()
 const userController = new UserController()
 
-userRouter.post('/login/facebook', validate(validateLoginWithFacebook as any), userController.loginWithFacebook)
-userRouter.post('/login/google', validate(validateLoginWithGoogle as any), userController.loginWithGoogle)
-userRouter.post('/login/email-password', validate(validateLoginWithEmailPassword as any), userController.loginWithEmailPassword)
-userRouter.post('/signup/email-password', validate(validateSignUpWithEmailPassword as any), userController.signUpWithEmailPassword)
-userRouter.post('/logout', userController.logout)
-userRouter.post('/refresh-token', validate(validateRefreshToken as any), userController.refreshToken)
-userRouter.post('/change-password', validate(validateChangePassword as any), userController.changePassword)
-
+userRouter.post('/profile', verifyAuthToken, validate(validateCreateUserProfile as any), userController.createUserProfile)
+userRouter.put('/profile/:id', verifyAuthToken, validate(validateUpdateUserProfile as any), userController.updateUserProfile)
+userRouter.get('/profile/:firebaseId', validate(validateGetUserByFirebaseId as any), userController.getUserByFirebaseId)
+userRouter.get('/check-username/:userName', verifyAuthToken, validate(validateCheckUserNameExists as any), userController.checkUserNameExists)
+userRouter.get('/:id', verifyAuthToken, validate(validateGetUserById as any), userController.getUserById)
+userRouter.post('/login', userController.loginWithEmailPassword)
 export default userRouter
 

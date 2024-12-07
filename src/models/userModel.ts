@@ -8,12 +8,19 @@ export interface IUser extends Document {
     userName: string
     email?: string
     role: 'USER' | 'ADMIN'
+    firebaseId: string
+    coins: number
 }
 
 const userSchema: Schema<IUser> = new Schema(
     {
         avatar: {
             type: String
+        },
+        firebaseId: {
+            type: String,
+            unique: true,
+            required: true
         },
         profileType: {
             type: String,
@@ -42,6 +49,10 @@ const userSchema: Schema<IUser> = new Schema(
             type: String,
             enum: ['USER', 'ADMIN'],
             default: 'USER'
+        },
+        coins: {
+            type: Number,
+            default: 0
         }
     },
     { timestamps: true }
