@@ -3,3 +3,5 @@ logs
 .env.development
 .env.production
 .env.example
+
+/build
