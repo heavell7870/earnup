@@ -8,6 +8,7 @@ import { defineRoutes } from './routes/index'
 import { connect } from './utils/db/index'
 import { errorHandler } from './utils/hanlders/errorHandler'
 import { ErrorHandlingMiddleware } from './middlewares/globalErrorHandler'
+import path from 'path'
 
 /* express application with all global level middleware */
 const createExpressApp = (): Express => {
@@ -37,6 +38,7 @@ const createExpressApp = (): Express => {
             }
         })
     )
+
     // Log an info message for each incoming request
     expressApp.use((req: Request, res: Response, next: NextFunction) => {
         logger.info(`${req.method} ${req.originalUrl}`)
