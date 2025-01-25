@@ -62,6 +62,7 @@ export class UserService {
 
             return newUser
         } catch (error) {
+            console.log(error)
             throw new AppError(StatusCodes.BAD_REQUEST, JSON.stringify(error))
         }
     }
