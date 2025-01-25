@@ -25,7 +25,6 @@ export class UserService {
 
     async createUserProfile(userData: Partial<IUser & { referralCode?: string }>): Promise<IUser> {
         // Check if user exists in Firebase Auth
-        console.log(userData)
         try {
             const user = await app.auth().getUser(userData.firebaseId!)
             if (!user) {
@@ -63,8 +62,7 @@ export class UserService {
 
             return newUser
         } catch (error) {
-            console.log(error)
-            throw new AppError(StatusCodes.BAD_REQUEST, 'User does not exist in Firebase Auth')
+            throw new AppError(StatusCodes.BAD_REQUEST, JSON.stringify(error))
         }
     }
 
