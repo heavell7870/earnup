@@ -43,3 +43,29 @@ export const verifyAuthToken = catchAuthAsync(async (req: AuthenticatedRequest, 
     }
 })
 
+export const verifyAuthTokenWithoutLocalUser = catchAuthAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+        const authHeader = req.headers.authorization
+
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            throw new AppError(StatusCodes.UNAUTHORIZED, 'No token provided')
+        }
+
+        const token = authHeader.split(' ')[1]
+
+        // Verify the Firebase token
+        const decodedToken = await admin.auth().verifyIdToken(token)
+
+        if (!decodedToken) {
+            throw new AppError(StatusCodes.UNAUTHORIZED, 'Invalid token')
+        }
+
+        next()
+    } catch (error) {
+        if (error instanceof AppError) {
+            throw error
+        }
+        throw new AppError(StatusCodes.UNAUTHORIZED, 'Authentication failed')
+    }
+})
+

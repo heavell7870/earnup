@@ -8,13 +8,13 @@ import {
     validateCheckUserNameExists,
     validateGetUserById
 } from '../validator/userValidation'
-import { verifyAuthToken } from '../middlewares/auth'
+import { verifyAuthToken, verifyAuthTokenWithoutLocalUser } from '../middlewares/auth'
 
 const userRouter: Router = express.Router()
 const userController = new UserController()
 
 userRouter.post('/login', userController.loginWithEmailPassword)
-userRouter.post('/profile', verifyAuthToken, validate(validateCreateUserProfile as any), userController.createUserProfile)
+userRouter.post('/profile', verifyAuthTokenWithoutLocalUser, validate(validateCreateUserProfile as any), userController.createUserProfile)
 userRouter.put('/profile/:id', verifyAuthToken, validate(validateUpdateUserProfile as any), userController.updateUserProfile)
 userRouter.get('/profile/:firebaseId', validate(validateGetUserByFirebaseId as any), userController.getUserByFirebaseId)
 userRouter.get('/check-username/:userName', verifyAuthToken, validate(validateCheckUserNameExists as any), userController.checkUserNameExists)
