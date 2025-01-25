@@ -10,7 +10,6 @@ import axios from 'axios'
 
 const FIREBASE_AUTH_URL = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCYmAlIqVcRp--ssi5ZIIGId7-jdm_4lHY'
 const serviceAccount = JSON.parse(readFileSync(join(__dirname, '../configs/firebase-service-account.json'), 'utf8'))
-console.log(serviceAccount)
 const app = admin.initializeApp({
     credential: admin.credential.cert(serviceAccount as admin.ServiceAccount)
 })
@@ -26,6 +25,7 @@ export class UserService {
 
     async createUserProfile(userData: Partial<IUser & { referralCode?: string }>): Promise<IUser> {
         // Check if user exists in Firebase Auth
+        console.log(userData)
         try {
             const user = await app.auth().getUser(userData.firebaseId!)
             if (!user) {
