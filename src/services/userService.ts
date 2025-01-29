@@ -126,5 +126,10 @@ export class UserService {
             id: localId
         }
     }
+
+    async checkEmailExists(email: string): Promise<boolean> {
+        const user = await this.repository.getOne({ email })
+        return !!user
+    }
 }
 

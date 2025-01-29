@@ -37,6 +37,12 @@ export class UserController {
         return res.status(StatusCodes.OK).send(new ApiResponse(StatusCodes.OK, { exists }, 'Username availability checked'))
     })
 
+    checkEmailExists = catchAsync(async (req: Request, res: Response): Promise<any> => {
+        const { email } = req.params
+        const exists = await this.service.checkEmailExists(email)
+        return res.status(StatusCodes.OK).send(new ApiResponse(StatusCodes.OK, { exists }, 'Email availability checked'))
+    })
+
     getUserById = catchAsync(async (req: Request, res: Response): Promise<any> => {
         const { id } = req.params
         const user = await this.service.getUserById(id)

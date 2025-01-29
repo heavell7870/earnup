@@ -56,6 +56,15 @@ export const validateCheckUserNameExists = {
     })
 }
 
+export const validateCheckEmailExists = {
+    params: Joi.object().keys({
+        email: Joi.string().required().messages({
+            'string.empty': 'Email is required',
+            'any.required': 'Email is required'
+        })
+    })
+}
+
 export const validateGetUserById = {
     params: Joi.object().keys({
         id: Joi.string().required().messages({

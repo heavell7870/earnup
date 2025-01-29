@@ -6,7 +6,8 @@ import {
     validateUpdateUserProfile,
     validateGetUserByFirebaseId,
     validateCheckUserNameExists,
-    validateGetUserById
+    validateGetUserById,
+    validateCheckEmailExists
 } from '../validator/userValidation'
 import { verifyAuthToken, verifyAuthTokenWithoutLocalUser } from '../middlewares/auth'
 
@@ -18,6 +19,7 @@ userRouter.post('/profile', verifyAuthTokenWithoutLocalUser, validate(validateCr
 userRouter.put('/profile/:id', verifyAuthToken, validate(validateUpdateUserProfile as any), userController.updateUserProfile)
 userRouter.get('/profile/:firebaseId', validate(validateGetUserByFirebaseId as any), userController.getUserByFirebaseId)
 userRouter.get('/check-username/:userName', verifyAuthToken, validate(validateCheckUserNameExists as any), userController.checkUserNameExists)
+userRouter.get('/check-email/:email', validate(validateCheckEmailExists as any), userController.checkEmailExists)
 userRouter.get('/:id', verifyAuthToken, validate(validateGetUserById as any), userController.getUserById)
 
 export default userRouter
