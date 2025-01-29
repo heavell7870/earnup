@@ -18,7 +18,11 @@ export const validateCreateBankAccount = {
             'string.empty': 'Bank name is required',
             'any.required': 'Bank name is required'
         }),
-        accountType: Joi.string().valid('SAVINGS', 'CURRENT').default('SAVINGS')
+        accountType: Joi.string().valid('SAVINGS', 'CURRENT').default('SAVINGS'),
+        vpa: Joi.string().required().messages({
+            'string.empty': 'VPA is required',
+            'any.required': 'VPA is required'
+        })
     })
 }
 
@@ -34,6 +38,7 @@ export const validateUpdateBankAccount = {
         accountNumber: Joi.string().optional(),
         ifscCode: Joi.string().optional(),
         bankName: Joi.string().optional(),
+        vpa: Joi.string().optional(),
         accountType: Joi.string().valid('SAVINGS', 'CURRENT').optional()
     })
 }

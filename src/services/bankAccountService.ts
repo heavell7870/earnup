@@ -21,6 +21,14 @@ export class BankAccountService {
                 throw new AppError(StatusCodes.BAD_REQUEST, 'Bank account already exists for this user')
             }
 
+            const existingVpa = await this.repository.getOne({
+                vpa: bankAccountData.vpa
+            })
+
+            if (existingVpa) {
+                throw new AppError(StatusCodes.BAD_REQUEST, 'This VPA is already in use')
+            }
+
             // Create new bank account
             const newBankAccount = await this.repository.create({ ...bankAccountData, userId })
             return newBankAccount

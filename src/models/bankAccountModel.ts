@@ -9,6 +9,7 @@ export interface IBankAccount extends Document {
     accountType: 'SAVINGS' | 'CURRENT'
     isVerified: boolean
     isDeleted: boolean
+    vpa: string
 }
 
 const bankAccountSchema: Schema<IBankAccount> = new Schema(
@@ -42,6 +43,11 @@ const bankAccountSchema: Schema<IBankAccount> = new Schema(
             type: String,
             enum: ['SAVINGS', 'CURRENT'],
             default: 'SAVINGS'
+        },
+        vpa: {
+            type: String,
+            required: true,
+            trim: true
         },
         isVerified: {
             type: Boolean,
