@@ -128,7 +128,7 @@ export class UserService {
     }
 
     async checkEmailExists(email: string): Promise<boolean> {
-        const user = await this.repository.getOne({ email })
+        const user = await this.repository.getOne({ email: decodeURIComponent(email) })
         return !!user
     }
 }
