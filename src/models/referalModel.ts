@@ -1,8 +1,8 @@
-import mongoose, { Document, Schema, Model } from 'mongoose'
+import mongoose, { Document, Schema, Model, ObjectId } from 'mongoose'
 
 export interface IReferral extends Document {
-    referrerId: string
-    refereeId: string
+    referrerId: ObjectId
+    refereeId: ObjectId
     status: 'PENDING' | 'COMPLETED' | 'EXPIRED'
     referralCode: string
     referralDate: Date
@@ -14,12 +14,12 @@ export interface IReferral extends Document {
 const referralSchema: Schema<IReferral> = new Schema(
     {
         referrerId: {
-            type: String,
+            type: Schema.Types.ObjectId,
             required: true,
             ref: 'users'
         },
         refereeId: {
-            type: String,
+            type: Schema.Types.ObjectId,
             required: true,
             ref: 'users'
         },
@@ -30,8 +30,7 @@ const referralSchema: Schema<IReferral> = new Schema(
         },
         referralCode: {
             type: String,
-            required: true,
-            unique: true
+            required: true
         },
         referralDate: {
             type: Date,

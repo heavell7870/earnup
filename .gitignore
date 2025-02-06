@@ -5,3 +5,4 @@ logs
 .env.example
 
 /build
+firebase-service-account.json

@@ -4,6 +4,7 @@ import { catchAsync, catchAuthAsync } from '../utils/hanlders/catchAsync'
 import { StatusCodes } from 'http-status-codes'
 import { ApiResponse } from '../utils/hanlders/appResponse'
 import { AuthenticatedRequest } from '../types'
+import { ObjectId } from 'mongoose'
 
 export class ReferralController {
     private service: ReferralService
@@ -39,7 +40,7 @@ export class ReferralController {
 
     getReferralById = catchAsync(async (req: Request, res: Response): Promise<any> => {
         const { id } = req.params
-        const referral = await this.service.getReferralById(id)
+        const referral = await this.service.getReferralById(id as unknown as ObjectId)
         return res.status(StatusCodes.OK).send(new ApiResponse(StatusCodes.OK, referral, 'Referral retrieved successfully'))
     })
 }

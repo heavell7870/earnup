@@ -10,6 +10,7 @@ export interface IUser extends Document {
     role: 'USER' | 'ADMIN'
     firebaseId: string
     coins: number
+    referralCode: string
 }
 
 const userSchema: Schema<IUser> = new Schema(
@@ -53,6 +54,10 @@ const userSchema: Schema<IUser> = new Schema(
         coins: {
             type: Number,
             default: 0
+        },
+        referralCode: {
+            type: String,
+            unique: true
         }
     },
     { timestamps: true }

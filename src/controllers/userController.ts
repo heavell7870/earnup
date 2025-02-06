@@ -4,6 +4,7 @@ import { catchAsync } from '../utils/hanlders/catchAsync'
 import { StatusCodes } from 'http-status-codes'
 import { ApiResponse } from '../utils/hanlders/appResponse'
 import { AppError } from '../utils/hanlders/appError'
+import { ObjectId } from 'mongoose'
 
 export class UserController {
     private service: UserService
@@ -45,7 +46,7 @@ export class UserController {
 
     getUserById = catchAsync(async (req: Request, res: Response): Promise<any> => {
         const { id } = req.params
-        const user = await this.service.getUserById(id)
+        const user = await this.service.getUserById(id as unknown as ObjectId)
         return res.status(StatusCodes.OK).send(new ApiResponse(StatusCodes.OK, user, 'User profile retrieved successfully'))
     })
 

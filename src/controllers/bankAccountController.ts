@@ -4,6 +4,7 @@ import { catchAsync } from '../utils/hanlders/catchAsync'
 import { StatusCodes } from 'http-status-codes'
 import { ApiResponse } from '../utils/hanlders/appResponse'
 import { AuthenticatedRequest } from '../types'
+import { ObjectId } from 'mongoose'
 
 export class BankAccountController {
     private service: BankAccountService
@@ -28,7 +29,7 @@ export class BankAccountController {
 
     getBankAccountById = catchAsync(async (req: Request, res: Response): Promise<any> => {
         const { id } = req.params
-        const bankAccount = await this.service.getBankAccountById(id)
+        const bankAccount = await this.service.getBankAccountById(id as unknown as ObjectId)
         return res.status(StatusCodes.OK).send(new ApiResponse(StatusCodes.OK, bankAccount, 'Bank account retrieved successfully'))
     })
 

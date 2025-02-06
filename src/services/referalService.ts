@@ -2,30 +2,33 @@ import { ReferalRepository } from '../repositories/referalReposiroty'
 import { IReferral } from '../models/referalModel'
 import { AppError } from '../utils/hanlders/appError'
 import { StatusCodes } from 'http-status-codes'
+import { UserRepository } from '../repositories/userReposiroty'
+import { ObjectId } from 'mongoose'
 
 export class ReferralService {
     private repository: ReferalRepository
-
+    private userRepository: UserRepository
     constructor() {
         this.repository = new ReferalRepository()
+        this.userRepository = new UserRepository()
     }
 
-    async createReferral(referralData: Partial<IReferral>, referrerId: string): Promise<IReferral> {
+    async createReferral(referralData: Partial<IReferral>, referrerId: ObjectId): Promise<IReferral> {
         try {
-            // Generate a unique referral code
-            let referralCode
-            let existingReferral
-            do {
-                // Generate a random 8 character alphanumeric code
-                referralCode = Math.random().toString(36).substring(2, 10).toUpperCase()
-                // Check if it already exists
-                existingReferral = await this.repository.getOne({ referralCode })
-            } while (existingReferral)
+            const userData = await this.userRepository.getById(referrerId)
+            if (!userData) {
+                throw new AppError(StatusCodes.BAD_REQUEST, 'Referrer not found')
+            }
+
+            const referee = await this.userRepository.getById(referralData.refereeId!)
+            if (!referee) {
+                throw new AppError(StatusCodes.BAD_REQUEST, 'Referee not found')
+            }
 
             // Add the generated referral code to the data
             const referralWithCode = {
                 ...referralData,
-                referralCode,
+                referralCode: userData.referralCode,
                 referrerId
             }
 
@@ -39,13 +42,13 @@ export class ReferralService {
 
     async updateReferralStatus(referralId: string, updateData: Partial<IReferral>): Promise<IReferral | null> {
         // Find and update referral status
-        const updatedReferral = await this.repository.updateById(referralId, updateData)
+        const updatedReferral = await this.repository.updateById(referralId, updateData, { upsert: true })
         return updatedReferral
     }
 
-    async getReferralByCode(referralCode: string): Promise<IReferral | null> {
+    async getReferralByCode(referralCode: string): Promise<IReferral[]> {
         // Find referral by code
-        const referral = await this.repository.getOne({ referralCode })
+        const referral = await this.repository.getAll({ referralCode })
         return referral
     }
 
@@ -61,7 +64,7 @@ export class ReferralService {
         return referrals
     }
 
-    async getReferralById(id: string): Promise<IReferral | null> {
+    async getReferralById(id: ObjectId): Promise<IReferral | null> {
         // Find referral by ID
         const referral = await this.repository.getById(id)
         return referral

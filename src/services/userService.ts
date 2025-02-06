@@ -7,20 +7,34 @@ import { AppError } from '../utils/hanlders/appError'
 import { StatusCodes } from 'http-status-codes'
 import { ReferralService } from '../services/referalService'
 import axios from 'axios'
+import { ObjectId } from 'mongoose'
+import { ReferalRepository } from '../repositories/referalReposiroty'
 
 const FIREBASE_AUTH_URL = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCYmAlIqVcRp--ssi5ZIIGId7-jdm_4lHY'
-const serviceAccount = JSON.parse(readFileSync(join(__dirname, '../configs/firebase-service-account.json'), 'utf8'))
+const serviceAccount = JSON.parse(readFileSync(join(__dirname, '../../firebase-service-account.json'), 'utf8'))
 const app = admin.initializeApp({
     credential: admin.credential.cert(serviceAccount as admin.ServiceAccount)
 })
 
+const generateReferralCode = async (repository: UserRepository) => {
+    let referralCode
+    let existingReferral
+    do {
+        // Generate a random 8 character alphanumeric code
+        referralCode = Math.random().toString(36).substring(2, 10).toUpperCase()
+        // Check if it already exists
+        existingReferral = await repository.getOne({ referralCode })
+    } while (existingReferral)
+    return referralCode
+}
+
 export class UserService {
     private repository: UserRepository
-    private referralService: ReferralService
+    private referralRepository: ReferalRepository
 
     constructor() {
         this.repository = new UserRepository()
-        this.referralService = new ReferralService()
+        this.referralRepository = new ReferalRepository()
     }
 
     async createUserProfile(userData: Partial<IUser & { referralCode?: string }>): Promise<IUser> {
@@ -35,23 +49,24 @@ export class UserService {
             if (existingUser) {
                 throw new AppError(StatusCodes.BAD_REQUEST, 'User already exists')
             }
-
+            const referralCode = await generateReferralCode(this.repository)
             // Create new user profile
-            const newUser = await this.repository.create({ ...userData, email: user.email })
+            const newUser = await this.repository.create({ ...userData, email: user.email, referralCode })
 
             // Handle referral if referral code is present
             if (userData.referralCode) {
-                const referral = await this.referralService.getReferralByCode(userData.referralCode)
-                if (referral && referral.status === 'PENDING') {
+                const referrer = await this.repository.getOne({ referralCode: userData.referralCode })
+                if (referrer) {
                     // Update referral status to completed
-                    await this.referralService.updateReferralStatus(referral._id as string, {
+                    await this.referralRepository.create({
                         status: 'COMPLETED',
                         rewardStatus: 'PAID',
-                        rewardAmount: 1000
+                        rewardAmount: 1000,
+                        referralCode: userData.referralCode,
+                        referrerId: referrer._id,
+                        refereeId: newUser._id
                     })
 
-                    // Update referrer's coins
-                    const referrer = await this.repository.getById(referral.referrerId)
                     if (referrer) {
                         await this.repository.updateById(referrer._id as string, {
                             $inc: { coins: 1000 }
@@ -84,17 +99,13 @@ export class UserService {
         return !!user
     }
 
-    async getUserById(id: string): Promise<IUser | null> {
+    async getUserById(id: ObjectId): Promise<IUser | null> {
         // Find user by firebaseId
         const user = await this.repository.getById(id)
         return user
     }
 
     async loginWithEmailPassword(email: string, password: string): Promise<any> {
-        const user = await this.repository.getOne({ email })
-        if (!user) {
-            throw new AppError(StatusCodes.NOT_FOUND, 'User does not exist')
-        }
         const response = await axios.post(
             FIREBASE_AUTH_URL,
             {

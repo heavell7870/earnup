@@ -1,8 +1,10 @@
+import { ObjectId } from 'mongoose'
+
 interface Model<T> {
     create(data: any): Promise<T>
     findByIdAndDelete(id: string): Promise<T>
     deleteMany(obj: any): Promise<T>
-    findById(id: string): Promise<T>
+    findById(id: ObjectId): Promise<T>
     find(filter: any): Promise<T[]>
     findOne(obj: any): Promise<T>
     findOneAndUpdate(query: any, updatedData: Partial<T>, options: any): Promise<T>
@@ -31,7 +33,7 @@ export class CrudRepository<T> {
         return response
     }
 
-    async getById(id: string): Promise<T> {
+    async getById(id: ObjectId): Promise<T> {
         const response = await this.model.findById(id)
         return response
     }
@@ -46,8 +48,8 @@ export class CrudRepository<T> {
         return response
     }
 
-    async updateById(id: string, updatedData: any): Promise<T> {
-        const response = await this.model.findOneAndUpdate({ _id: id }, updatedData, { new: true })
+    async updateById(id: string, updatedData: any, options: { upsert?: boolean; new?: boolean } = { upsert: false, new: true }): Promise<T> {
+        const response = await this.model.findOneAndUpdate({ _id: id }, updatedData, options)
         return response
     }
 

@@ -2,6 +2,7 @@ import { BankAccountRepository } from '../repositories/bankAccountReposiroty'
 import { IBankAccount } from '../models/bankAccountModel'
 import { AppError } from '../utils/hanlders/appError'
 import { StatusCodes } from 'http-status-codes'
+import { ObjectId } from 'mongoose'
 
 export class BankAccountService {
     private repository: BankAccountRepository
@@ -50,7 +51,7 @@ export class BankAccountService {
         }
     }
 
-    async getBankAccountById(id: string): Promise<IBankAccount | null> {
+    async getBankAccountById(id: ObjectId): Promise<IBankAccount | null> {
         try {
             const bankAccount = await this.repository.getById(id)
             if (!bankAccount) {
