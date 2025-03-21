@@ -9,6 +9,7 @@ import { ReferralService } from '../services/referalService'
 import axios from 'axios'
 import { ObjectId } from 'mongoose'
 import { ReferalRepository } from '../repositories/referalReposiroty'
+import { EarningRepository } from '../repositories/earningReposiroty'
 
 const FIREBASE_AUTH_URL = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCYmAlIqVcRp--ssi5ZIIGId7-jdm_4lHY'
 const serviceAccount = JSON.parse(readFileSync(join(__dirname, '../../firebase-service-account.json'), 'utf8'))
@@ -31,10 +32,12 @@ const generateReferralCode = async (repository: UserRepository) => {
 export class UserService {
     private repository: UserRepository
     private referralRepository: ReferalRepository
+    private earningRepository: EarningRepository
 
     constructor() {
         this.repository = new UserRepository()
         this.referralRepository = new ReferalRepository()
+        this.earningRepository = new EarningRepository()
     }
 
     async createUserProfile(userData: Partial<IUser & { referralCode?: string }>): Promise<IUser> {
@@ -63,13 +66,20 @@ export class UserService {
                         rewardStatus: 'PAID',
                         rewardAmount: 1000,
                         referralCode: userData.referralCode,
-                        referrerId: referrer._id,
-                        refereeId: newUser._id
+                        referrerId: referrer._id as ObjectId,
+                        refereeId: newUser._id as ObjectId
                     })
 
                     if (referrer) {
                         await this.repository.updateById(referrer._id as string, {
                             $inc: { coins: 1000 }
+                        })
+                        await this.earningRepository.create({
+                            userId: referrer._id as ObjectId,
+                            amount: 1000,
+                            source: 'REFERRAL',
+                            referralId: newUser._id as ObjectId,
+                            status: 'PAID'
                         })
                     }
                 }

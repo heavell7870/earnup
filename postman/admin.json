@@ -1,0 +1,150 @@
+{
+    "info": {
+        "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "name": "Admin API",
+        "description": "Collection for admin-related endpoints",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Get Earnings Growth",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{adminToken}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/api/v1/admin/earnings-growth/:userId?startDate={{startDate}}&endDate={{endDate}}",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["api", "v1", "admin", "earnings-growth", ":userId"],
+                    "query": [
+                        {
+                            "key": "startDate",
+                            "value": "{{startDate}}"
+                        },
+                        {
+                            "key": "endDate",
+                            "value": "{{endDate}}"
+                        }
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "",
+                            "description": "Optional user ID to filter earnings"
+                        }
+                    ]
+                },
+                "description": "Get earnings growth data with optional user ID filter and date range"
+            },
+            "response": []
+        },
+        {
+            "name": "Get Weekly Active Users",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{adminToken}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/api/v1/admin/weekly-active-users?startDate={{startDate}}&endDate={{endDate}}",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["api", "v1", "admin", "weekly-active-users"],
+                    "query": [
+                        {
+                            "key": "startDate",
+                            "value": "{{startDate}}",
+                            "description": "Required start date"
+                        },
+                        {
+                            "key": "endDate",
+                            "value": "{{endDate}}",
+                            "description": "Required end date"
+                        }
+                    ]
+                },
+                "description": "Get weekly active users statistics within a date range"
+            },
+            "response": []
+        },
+        {
+            "name": "Get Weekly Ad Watched Stats",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{adminToken}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/api/v1/admin/weekly-ad-watched-stats?startDate={{startDate}}&endDate={{endDate}}",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["api", "v1", "admin", "weekly-ad-watched-stats"],
+                    "query": [
+                        {
+                            "key": "startDate",
+                            "value": "{{startDate}}",
+                            "description": "Required start date"
+                        },
+                        {
+                            "key": "endDate",
+                            "value": "{{endDate}}",
+                            "description": "Required end date"
+                        }
+                    ]
+                },
+                "description": "Get weekly ad watched statistics within a date range"
+            },
+            "response": []
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [""]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [""]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:3000",
+            "type": "string"
+        },
+        {
+            "key": "adminToken",
+            "value": "your-admin-token-here",
+            "type": "string"
+        },
+        {
+            "key": "startDate",
+            "value": "2023-01-01",
+            "type": "string"
+        },
+        {
+            "key": "endDate",
+            "value": "2023-12-31",
+            "type": "string"
+        }
+    ]
+}
+
